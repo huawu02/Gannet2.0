@@ -112,6 +112,10 @@ for ii=1:numscans
         sigma = ( 1 / (2 * (abs(GaussModelParam(ii,2)))) ).^(1/2);
         MRS_struct.out.GABAFWHM(ii) =  abs( (2* MRS_struct.p.LarmorFreq) * sigma);
         MRS_struct.out.GABAModelFit(ii,:)=GaussModelParam(ii,:);
+        MRS_struct.out.GABAresid(ii,:) = residg;
+        MRS_struct.out.GABAsnr(ii) = GABAheight / std(residg);
+      
+        
     elseif strcmp(MRS_struct.p.target,'GSH')
         %GSH fit
         
