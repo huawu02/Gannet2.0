@@ -10,7 +10,7 @@ function [ MRS_struct ] = SiemensTwixRead(MRS_struct, fname,fname_water)
             %This handles the GABA data - it is needed whatever..
             %Use mapVBVD to pull in data.        
             twix_obj=mapVBVD(fname);
-            if(MRS_struct.p.Siemens_type==4)||(MRS_struct.p.Siemens_type==5)
+            if(MRS_struct.p.Siemens_type==4)||(MRS_struct.p.Siemens_type==5)||(MRS_struct.p.Siemens_type==6)
                 twix_obj=twix_obj{2};
             end
   %          save twix_obj
@@ -75,7 +75,7 @@ function [ MRS_struct ] = SiemensTwixRead(MRS_struct, fname,fname_water)
             %End of Jamie Near's code
             %Calculate some parameters:
             MRS_struct.p.sw=spectralwidth;
-            if MRS_struct.p.Siemens_type == 4
+            if (MRS_struct.p.Siemens_type == 4) || (MRS_struct.p.Siemens_type == 5) || (MRS_struct.p.Siemens_type == 6)
                 MRS_struct.p.sw=MRS_struct.p.sw/100;
             end
             MRS_struct.p.LarmorFreq = Bo*42.577;          
@@ -122,7 +122,12 @@ function [ MRS_struct ] = SiemensTwixRead(MRS_struct, fname,fname_water)
                     %Undo Plus-minus 
                     %FullData(:,:,2,:)=-FullData(:,:,2,:);
                     %size(FullData)
-                    FullData=reshape(FullData,[twix_obj.image.NCha twix_obj.image.NCol twix_obj.image.NAve*twix_obj.image.NIde]);    
+                    FullData=reshape(FullData,[twix_obj.image.NCha twix_obj.image.NCol twix_obj.image.NAve*twix_obj.image.NIde]);
+                case 6
+                    FullData=permute(reshape(double(twix_obj.image()),[twix_obj.image.NCol twix_obj.image.NCha twix_obj.image.NAve twix_obj.image.NSet]),[2 1 4 3]);
+                    %Undo Plus-minus 
+                    %FullData(:,:,2,:)=-FullData(:,:,2,:);
+                    FullData=reshape(FullData,[twix_obj.image.NCha twix_obj.image.NCol twix_obj.image.NAve*twix_obj.image.NSet]);
             end
                 MRS_struct.p.Navg(ii) = double(twix_obj.image.NAcq);
                 %Trim off points at the start! RE 4/16/15 (Uncertain whether this should be done for all acquisitions or just some)
@@ -147,8 +152,8 @@ function [ MRS_struct ] = SiemensTwixRead(MRS_struct, fname,fname_water)
         if(nargin==3)
            %Then we additionally need to pull in the water data. 
            twix_obj_water=mapVBVD(fname_water);
-            if(MRS_struct.p.Siemens_type==4)
-                twix_obj=twix_obj{2};
+           if(MRS_struct.p.Siemens_type==4) || (MRS_struct.p.Siemens_type==5) || (MRS_struct.p.Siemens_type==6)
+                twix_obj_water=twix_obj_water{2};
            end
            MRS_struct.p.nrows_water = twix_obj_water.image.NAcq;
            MRS_struct.p.npoints_water = twix_obj_water.image.NCol;
@@ -162,13 +167,13 @@ function [ MRS_struct ] = SiemensTwixRead(MRS_struct, fname,fname_water)
                % according to above, in some the undo plus-mins on the
                % WaterData(:,:,2,:) may not be needed 
                switch MRS_struct.p.Siemens_type
-                    case 1 % this was the original code - made it into case 1, 2 and 4 
+                    case 1 % this was the original code - made it into case 1, 2
                        % Copy it into WaterData
                         WaterData=permute(reshape(double(twix_obj_water.image()),[twix_obj_water.image.NCol twix_obj_water.image.NCha twix_obj_water.image.NSet twix_obj_water.image.NIda]),[2 1 4 3]);
                         %Undo Plus-minus 
                         WaterData(:,:,2,:)=-WaterData(:,:,2,:);
                         WaterData=reshape(WaterData,[twix_obj_water.image.NCha twix_obj_water.image.NCol twix_obj_water.image.NSet*twix_obj_water.image.NIda]);
-                    case 2 % this was the original code - made it into case 1, 2 and 4  
+                    case 2 % this was the original code - made it into case 1, 2
                        % Copy it into WaterData
                         WaterData=permute(reshape(double(twix_obj_water.image()),[twix_obj_water.image.NCol twix_obj_water.image.NCha twix_obj_water.image.NSet twix_obj_water.image.NIda]),[2 1 4 3]);
                         %Undo Plus-minus 
@@ -180,12 +185,18 @@ function [ MRS_struct ] = SiemensTwixRead(MRS_struct, fname,fname_water)
                         %Undo Plus-minus 
                         %WaterData(:,:,2,:)=-WaterData(:,:,2,:);
                         WaterData=reshape(WaterData,[twix_obj_water.image.NCha twix_obj_water.image.NCol twix_obj_water.image.NSet*twix_obj_water.image.NIda]);
-                    case 4 % this was the original code - made it into case 1, 2 and 4
+                    case 4 % 
                        % Copy it into WaterData
-                        WaterData=permute(reshape(double(twix_obj_water.image()),[twix_obj_water.image.NCol twix_obj_water.image.NCha twix_obj_water.image.NSet twix_obj_water.image.NIda]),[2 1 4 3]);
+                        WaterData=permute(reshape(double(twix_obj_water.image()),[twix_obj_water.image.NCol twix_obj_water.image.NCha twix_obj_water.image.NAve twix_obj_water.image.NIde]),[2 1 4 3]);
                         %Undo Plus-minus 
                         %WaterData(:,:,2,:)=-WaterData(:,:,2,:);
-                        WaterData=reshape(WaterData,[twix_obj_water.image.NCha twix_obj_water.image.NCol twix_obj_water.image.NSet*twix_obj_water.image.NIda]);
+                        WaterData=reshape(WaterData,[twix_obj_water.image.NCha twix_obj_water.image.NCol twix_obj_water.image.NAve*twix_obj_water.image.NIde]);
+                    case 6 %   
+                       % Copy it into WaterData
+                        WaterData=permute(reshape(double(twix_obj_water.image()),[twix_obj_water.image.NCol twix_obj_water.image.NCha twix_obj_water.image.NAve twix_obj_water.image.NSet]),[2 1 4 3]);
+                        %Undo Plus-minus 
+                        WaterData(:,:,2,:)=-WaterData(:,:,2,:);
+                        WaterData=reshape(WaterData,[twix_obj_water.image.NCha twix_obj_water.image.NCol twix_obj_water.image.NAve*twix_obj_water.image.NSet]);
                end
 
           end

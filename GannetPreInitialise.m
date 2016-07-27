@@ -7,7 +7,7 @@ function MRS_struct=GannetPreInitialise(MRS_struct)
 %Acquisition Parameters
     MRS_struct.p.sw=2000;  % sw taken from header for all formats except Philips .data
    % MRS_struct.p.sw=5000; %This should be parsed from headers where possible
-    MRS_struct.p.npoints=2048; %This is twice the acquired points for TWIX data;
+    MRS_struct.p.npoints=1024; %This is twice the acquired points for TWIX data;
     %This should be parsed from headers where possible
     MRS_struct.p.TR=2000;%This should be parsed from headers where possible
     MRS_struct.p.TE=68; %This should be parsed from headers where possible
@@ -20,7 +20,7 @@ function MRS_struct=GannetPreInitialise(MRS_struct)
     MRS_struct.p.Water_Positive=1; %For Philips MOIST ws, set to 0.
     %Siemens header information differs between versions
     %switch for different versions
-    MRS_struct.p.Siemens_type = 1; %1 = TIM TRIO WIP 2 = Near seq 3 =Skyra WIP; 4=Prisma (VD13C); 5=Prisma(Minnesota)
+    MRS_struct.p.Siemens_type = 1; %1 = TIM TRIO WIP 2 = Near seq 3 =Skyra WIP; 4=Prisma (VD13C); 5=Prisma(Minnesota); 6 = Jamie's VE11B (Jena)
     
 %Analysis Parameters
     MRS_struct.p.LB = 3;
