@@ -26,6 +26,9 @@ for filecheck=1:length(gabafile)
     end
 end
 if(nargin > 1)
+    if ischar(waterfile)
+        waterfile = strsplit(waterfile,' ');
+    end
     for filecheck=1:length(waterfile)        
         if(~exist(waterfile{filecheck}))
             disp(['The file ' waterfile(filecheck) ' is missing. Typo?'])
@@ -35,7 +38,7 @@ if(nargin > 1)
 end
 if missing
         error('Not all the files are there, so I give up.');
-    end
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,9 +79,9 @@ MRS_struct=GannetDiscernDatatype(pfiles{1},MRS_struct);
 %%%%%%%%%%%%%%%%%%%%%%%%
 
     % create dir for output
-    if(exist('./MRSload_output','dir') ~= 7)
-        mkdir MRSload_output
-    end
+    %if(exist('./MRSload_output','dir') ~= 7)
+    %    mkdir MRSload_output
+    %end
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%    
 %   4. Load Data from files
@@ -499,7 +502,8 @@ for ii=1:numpfiles    %Loop over all files in the batch (from gabafile)
               if(strcmpi(MRS_struct.p.vendor,'Philips_data'))
                   pdfname=[ 'MRSload_output/' fullpath '.pdf' ];
               else
-                  pdfname=[ 'MRSload_output/' pfil_nopath  '.pdf' ];
+                  %pdfname=[ 'MRSload_output/' pfil_nopath  '.pdf' ];
+                  pdfname=['e' num2str(MRS_struct.p.ex_no) '_s' num2str(MRS_struct.p.se_no) '_MRSload.pdf']; % new output name, ex_se_MRSload.pdf
               end
               saveas(h, pdfname);
 
@@ -552,4 +556,6 @@ for ii=1:numpfiles    %Loop over all files in the batch (from gabafile)
         MRS_struct = orderfields(MRS_struct, structorder);
 
 end%end of load-and-processing loop over datasets
-end
+
+%save('MRSload_output/MRS_struct', 'MRS_struct');
+

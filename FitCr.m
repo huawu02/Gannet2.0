@@ -8,6 +8,8 @@
     nlinopts = statset('nlinfit');
     nlinopts = statset(nlinopts, 'MaxIter', 1e5, 'Display','Off');
     nframes = size(FrameData,2);
+    options = optimset('lsqcurvefit');
+    options = optimset(options,'Display','off','TolFun',1e-10,'Tolx',1e-10,'MaxIter',1e5);
     
     for jj = 1:nframes
         % [fit_param, resnorm, resid, exitflag ]  = ...
@@ -21,7 +23,7 @@
      %   size(TwoLorentzModel(initx,freq'))
         [fit_param, resnorm, resid, exitflag ]  = ...
             lsqcurvefit(@(xdummy,ydummy) LorentzModel(xdummy, ydummy), initx, ...
-                         freq', real(FrameData(:,jj)));
+                         freq', real(FrameData(:,jj)),[],[],options);
               initxLSQ = fit_param;
         
         [fit_param, residCr] = nlinfit(freq', real(FrameData(:,jj)), ...

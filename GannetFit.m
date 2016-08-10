@@ -13,6 +13,7 @@ function [MRS_struct] = GannetFit(MRS_struct, varargin)
 %            parameters set in GannetPreInitialise; can include several
 %            options, which are:
 %            'GABA' or 'Glx': target metabolite
+
 if nargin > 1
 switch varargin{1}
             case 'GABA'
@@ -32,7 +33,9 @@ if strcmp(MRS_struct.p.Reference_compound,'H2O')
     WaterData=MRS_struct.spec.water;
 end
 MRS_struct.versionfit = '140709';
-disp(['GABA Fit Version is ' MRS_struct.versionfit ]);
+if ~isdeployed
+    disp(['GABA Fit Version is ' MRS_struct.versionfit ]);
+end
 fitwater=1;
 numscans=size(GABAData);
 numscans=numscans(1);
@@ -84,7 +87,7 @@ for ii=1:numscans
         options = optimset('lsqcurvefit');
         options = optimset(options,'Display','off','TolFun',1e-10,'Tolx',1e-10,'MaxIter',1e5);
         nlinopts = statset('nlinfit');
-        nlinopts = statset(nlinopts, 'MaxIter', 1e5);
+        nlinopts = statset(nlinopts, 'MaxIter', 1e5, 'Display','off');
          
         %Fitting to a Gaussian model happens here
          [GaussModelParam(ii,:),resnorm,residg] = lsqcurvefit(@(xdummy,ydummy) GaussModel_area(xdummy,ydummy), ...
@@ -878,13 +881,14 @@ Cr_OFF=MRS_struct.spec.off(ii,:);
     if(strcmpi(MRS_struct.p.vendor,'Philips_data'))
         pdfname=[ epsdirname '/' fullpath '.pdf' ];
     else
-        pdfname=[ epsdirname '/' pfil_nopath  '.pdf' ];
+        %pdfname=[ epsdirname '/' pfil_nopath  '.pdf' ];
+        pdfname=['e' num2str(MRS_struct.p.ex_no) '_s' num2str(MRS_struct.p.se_no) '_MRSfit.pdf'];
     end
     %epsdirname
-    if(exist(epsdirname,'dir') ~= 7)
-        epsdirname
-        mkdir(epsdirname)
-    end
+    %if(exist(epsdirname,'dir') ~= 7)
+    %    epsdirname
+    %    mkdir(epsdirname)
+    %end
     saveas(gcf, pdfname);
     if(ii==numscans)
     if((MRS_struct.p.mat) == 1)
@@ -926,6 +930,7 @@ Cr_OFF=MRS_struct.spec.off(ii,:);
 
 MRS_struct = orderfields(MRS_struct, structorder);
 
+save(['e' num2str(MRS_struct.p.ex_no) '_s' num2str(MRS_struct.p.se_no) '_MRS_struct'], 'MRS_struct');
     
 % Dec 09: based on FitSeries.m:  Richard's GABA Fitting routine
 %     Fits using GaussModel

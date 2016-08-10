@@ -31,7 +31,7 @@ function [ MRS_struct ] = GERead(MRS_struct, fname)
                     pfile_header_size= 61464;
                 elseif (f_hdr_value == 11.0);  % 12.0 product release
                     pfile_header_size= 66072;
-                elseif (f_hdr_value > 11.0) & (f_hdr_value < 100.0)  % 14.0 and later
+                elseif (f_hdr_value > 11.0) && (f_hdr_value < 100.0)  % 14.0 and later
                     status = fseek(fid, 1468, 'bof');
                     pfile_header_size = fread(fid,1,'integer*4');
                 else
@@ -61,9 +61,14 @@ function [ MRS_struct ] = GERead(MRS_struct, fname)
             stop_recv = hdr_value(102);
             nreceivers = (stop_recv - start_recv) + 1;
 
-
+            % get the exam/series number, for naming the output file
+            status = fseek(fid, 147340, 'bof');
+            image_hdr = read_image_header( fid, 24 );
+            MRS_struct.p.ex_no = image_hdr.im_exno;
+            MRS_struct.p.se_no = image_hdr.im_seno;
+            
             % Specto Prescan pfiles
-            if (MRS_struct.p.npoints == 1) & (MRS_struct.p.nrows == 1)
+            if (MRS_struct.p.npoints == 1) && (MRS_struct.p.nrows == 1)
                 MRS_struct.p.npoints = 2048;
             end
             
@@ -119,8 +124,8 @@ function [ MRS_struct ] = GERead(MRS_struct, fname)
 
                 Frames_for_Water = 8;
             else
-               dataframes = f_hdr_value(59)/navs
-               refframes = f_hdr_value(74)
+               dataframes = f_hdr_value(59)/navs;
+               refframes = f_hdr_value(74);
                
                MRS_struct.p.Navg(ii) = dataframes*navs;
                MRS_struct.p.Nwateravg = refframes*2;
