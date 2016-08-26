@@ -345,7 +345,7 @@ for ii=1:numpfiles    %Loop over all files in the batch (from gabafile)
             close(101)
         end
         h=figure(101);
-        set(h, 'Position', [100, 100, 1000, 707]);
+        set(h, 'Position', [100, 100, 1000, 707],'visible','off');
         set(h,'Color',[1 1 1]);
         figTitle = ['GannetLoad Output'];
         set(gcf,'Name',figTitle,'Tag',figTitle, 'NumberTitle','off');

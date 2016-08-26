@@ -371,7 +371,7 @@ for ii=1:numscans
         close(fignum)
     end
     h=figure(fignum);
-    set(h, 'Position', [100, 100, 1000, 707]);
+    set(h, 'Position', [100, 100, 1000, 707], 'visible','off');
     set(h,'Color',[1 1 1]);
     figTitle = ['GannetFit Output'];
     set(gcf,'Name',figTitle,'Tag',figTitle, 'NumberTitle','off');

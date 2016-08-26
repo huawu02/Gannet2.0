@@ -9,6 +9,8 @@ if ~isempty(gabafile) && ischar(gabafile)
     end
 end
 
+disp('Running Gannet toolbox...');
+
 MRS_struct = GannetLoad(gabafile);
 GannetFit(MRS_struct);
 
